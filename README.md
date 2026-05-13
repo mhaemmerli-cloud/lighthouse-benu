@@ -17,3 +17,5 @@ name: Pharmacy: url: https://www.benu.ch/p/benu-luzern-bahnhof
 name: PDP: url: https://www.benu.ch/kijimea-reizdarm-pro-kapsel-84-stuck
 
 name: Category: url: https://www.benu.ch/c/gesundheit/
+
+name: Brandpage: url: https://www.benu.ch/b/la-roche-posay
