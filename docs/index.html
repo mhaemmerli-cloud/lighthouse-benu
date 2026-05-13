@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Lighthouse Dashboard – benu.ch</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: sans-serif; max-width: 1200px; margin: 0 auto; padding: 20px; background: #f5f5f5; }
+    h1 { color: #333; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .card { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    h2 { margin-top: 0; font-size: 1rem; color: #666; }
+  </style>
+</head>
+<body>
+  <h1>🔦 Lighthouse Dashboard – benu.ch</h1>
+  <div class="grid" id="charts"></div>
+
+  <script>
+    const PAGES = ["Home", "Editorial", "Pharmacy", "PDP", "Category", "Brandpage (LRP)"];
+    const COLORS = {
+      performance: "#4CAF50",
+      accessibility: "#2196F3",
+      seo: "#FF9800",
+      best_practices: "#9C27B0"
+    };
+
+    fetch("results.json")
+      .then(r => r.json())
+      .then(data => {
+        PAGES.forEach(page => {
+          const pageData = data.filter(d => d.page === page);
+          const labels = pageData.map(d => d.date);
+
+          const card = document.createElement("div");
+          card.className = "card";
+          card.innerHTML = `<h2>${page}</h2><canvas id="chart-${page}"></canvas>`;
+          document.getElementById("charts").appendChild(card);
+
+          new Chart(document.getElementById(`chart-${page}`), {
+            type: "line",
+            data: {
+              labels,
+              datasets: [
+                { label: "Performance", data: pageData.map(d => d.performance), borderColor: COLORS.performance, tension: 0.3 },
+                { label: "Accessibility", data: pageData.map(d => d.accessibility), borderColor: COLORS.accessibility, tension: 0.3 },
+                { label: "SEO", data: pageData.map(d => d.seo), borderColor: COLORS.seo, tension: 0.3 },
+                { label: "Best Practices", data: pageData.map(d => d.best_practices), borderColor: COLORS.best_practices, tension: 0.3 }
+              ]
+            },
+            options: {
+              scales: { y: { min: 0, max: 100 } }
+            }
+          });
+        });
+      });
+  </script>
+</body>
+</html>
