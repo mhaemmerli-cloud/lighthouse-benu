@@ -9158,5 +9158,37 @@
     "accessibility": 100,
     "seo": 100,
     "best_practices": 79
+  },
+  {
+    "date": "2026-07-02 18:10",
+    "page": "Home",
+    "performance": 37,
+    "accessibility": 99,
+    "seo": 100,
+    "best_practices": 82
+  },
+  {
+    "date": "2026-07-02 18:26",
+    "page": "Brandpage (LRP)",
+    "performance": 34,
+    "accessibility": 99,
+    "seo": 100,
+    "best_practices": 82
+  },
+  {
+    "date": "2026-07-02 18:07",
+    "page": "PDP",
+    "performance": 28,
+    "accessibility": 91,
+    "seo": 100,
+    "best_practices": 82
+  },
+  {
+    "date": "2026-07-02 17:47",
+    "page": "Pharmacy",
+    "performance": 31,
+    "accessibility": 89,
+    "seo": 100,
+    "best_practices": 79
   }
 ]
