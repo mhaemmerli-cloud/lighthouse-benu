@@ -10238,5 +10238,45 @@
     "accessibility": 96,
     "seo": 100,
     "best_practices": 79
+  },
+  {
+    "date": "2026-07-10 17:48",
+    "page": "Editorial",
+    "performance": 35,
+    "accessibility": 95,
+    "seo": 92,
+    "best_practices": 82
+  },
+  {
+    "date": "2026-07-10 17:48",
+    "page": "Home",
+    "performance": 33,
+    "accessibility": 96,
+    "seo": 100,
+    "best_practices": 82
+  },
+  {
+    "date": "2026-07-10 17:48",
+    "page": "PDP",
+    "performance": 33,
+    "accessibility": 88,
+    "seo": 100,
+    "best_practices": 82
+  },
+  {
+    "date": "2026-07-10 17:48",
+    "page": "Pharmacy",
+    "performance": 39,
+    "accessibility": 89,
+    "seo": 100,
+    "best_practices": 79
+  },
+  {
+    "date": "2026-07-10 17:48",
+    "page": "Category",
+    "performance": 47,
+    "accessibility": 96,
+    "seo": 100,
+    "best_practices": 79
   }
 ]
