@@ -6,13 +6,34 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body { font-family: sans-serif; max-width: 1400px; margin: 0 auto; padding: 20px; background: #f5f5f5; }
-    h1 { color: #333; }
-    h2 { margin-top: 0; font-size: 1rem; color: #666; }
+    h1 { color: #333; margin-bottom: 8px; }
 
+    /* Nav */
+    .nav { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 28px; }
+    .nav a {
+      padding: 6px 14px; background: white; border: 1px solid #ddd;
+      border-radius: 20px; font-size: 0.85rem; color: #333; text-decoration: none;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    .nav a:hover { background: #4CAF50; color: white; border-color: #4CAF50; }
+
+    h2.section-title { color: #333; font-size: 1.3rem; margin-top: 48px; margin-bottom: 4px; }
+
+    /* Anchor links above tables */
+    .anchor-links { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+    .anchor-links a {
+      padding: 5px 13px; background: white; border: 1px solid #ddd;
+      border-radius: 20px; font-size: 0.83rem; color: #333; text-decoration: none;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    .anchor-links a:hover { background: #4CAF50; color: white; border-color: #4CAF50; }
+
+    /* Charts */
     .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
     .card { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .card h2 { margin-top: 0; font-size: 1rem; color: #666; }
 
-    .table-section { margin-top: 48px; }
+    /* Tables */
     .table-wrap {
       background: white; border-radius: 8px; padding: 20px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1); overflow-x: auto; margin-bottom: 28px;
@@ -48,12 +69,26 @@
     .pagination button.active { background: #4CAF50; color: white; border-color: #4CAF50; }
     .pagination button:hover:not(.active) { background: #f0f0f0; }
     .row-count { font-size: 0.82rem; color: #999; margin-top: 6px; }
+
+    /* Back to top */
+    .back-top { font-size: 0.8rem; color: #aaa; text-decoration: none; float: right; margin-top: 4px; }
+    .back-top:hover { color: #4CAF50; }
   </style>
 </head>
 <body>
+  <div id="top"></div>
   <h1>🔦 Lighthouse Dashboard – benu.ch</h1>
+
+  <!-- Top navigation -->
+  <nav class="nav" id="topNav"></nav>
+
+  <!-- Charts -->
   <div class="grid" id="charts"></div>
-  <div class="table-section" id="tables"></div>
+
+  <!-- Tables section -->
+  <h2 class="section-title">📋 Runs nach Seitentyp</h2>
+  <div class="anchor-links" id="anchorLinks"></div>
+  <div id="tables"></div>
 
   <script>
     const PAGES = ["Home", "Editorial", "Pharmacy", "PDP", "Category", "Brandpage (LRP)"];
@@ -76,10 +111,45 @@
     fetch("results.json")
       .then(r => r.json())
       .then(data => {
+        buildNav(data);
         buildCharts(data);
         buildAllTables(data);
       });
 
+    // ── Navigation ────────────────────────────────────────
+    function buildNav(data) {
+      const topNav     = document.getElementById('topNav');
+      const anchorLinks = document.getElementById('anchorLinks');
+
+      // Link to charts section
+      const chartLink = document.createElement('a');
+      chartLink.href = '#charts-section';
+      chartLink.textContent = '📈 Charts';
+      topNav.appendChild(chartLink);
+
+      PAGES.forEach(page => {
+        const pd = data.filter(d => d.page === page);
+        if (!pd.length) return;
+        const id = safeid(page);
+
+        // Top nav
+        const a1 = document.createElement('a');
+        a1.href = `#table-${id}`;
+        a1.textContent = page;
+        topNav.appendChild(a1);
+
+        // Anchor links above tables
+        const a2 = document.createElement('a');
+        a2.href = `#table-${id}`;
+        a2.textContent = page;
+        anchorLinks.appendChild(a2);
+      });
+
+      // Add charts anchor
+      document.getElementById('charts').id = 'charts-section';
+    }
+
+    // ── Charts ────────────────────────────────────────────
     function buildCharts(data) {
       PAGES.forEach(page => {
         const pd = data.filter(d => d.page === page);
@@ -87,7 +157,7 @@
         const card = document.createElement("div");
         card.className = "card";
         card.innerHTML = `<h2>${page}</h2><canvas id="chart-${safeid(page)}"></canvas>`;
-        document.getElementById("charts").appendChild(card);
+        document.getElementById("charts-section").appendChild(card);
         new Chart(document.getElementById(`chart-${safeid(page)}`), {
           type: "line",
           data: {
@@ -104,28 +174,33 @@
       });
     }
 
+    // ── Tables ────────────────────────────────────────────
     function buildAllTables(data) {
       const container = document.getElementById('tables');
-      container.innerHTML = '<h2 style="font-size:1.3rem;color:#333;margin-bottom:4px">📋 Runs nach Seitentyp</h2>';
 
       PAGES.forEach(page => {
         const pageData = data.filter(d => d.page === page);
         if (!pageData.length) return;
         const id = safeid(page);
-        state[id] = { sortCol:'date', sortDir:-1, currentPage:1, filtered:[...pageData], all:pageData };
+
+        // Default: sorted by date descending
+        const sorted = [...pageData].sort((a,b) => b.date.localeCompare(a.date));
+        state[id] = { sortCol:'date', sortDir:-1, currentPage:1, filtered: sorted, all: pageData };
 
         const wrap = document.createElement('div');
         wrap.className = 'table-wrap';
+        wrap.id = `table-${id}`;
         wrap.innerHTML = `
+          <a class="back-top" href="#top">↑ Nach oben</a>
           <h3>${page} <span style="font-weight:normal;color:#999;font-size:0.85rem">(${pageData.length} Einträge gesamt)</span></h3>
           <div class="filter-bar">
             <label>Von: <input type="date" id="from-${id}"></label>
-            <label>Bis: <input type="date" id="to-${id}"></label>
+            <label>Bis:  <input type="date" id="to-${id}"></label>
             <label>Suche: <input type="text" id="search-${id}" placeholder="Datum suchen..."></label>
             <label>Zeilen:
               <select id="size-${id}">
-                <option value="25">25</option>
-                <option value="50" selected>50</option>
+                <option value="25" selected>25</option>
+                <option value="50">50</option>
                 <option value="100">100</option>
                 <option value="999999">Alle</option>
               </select>
