@@ -8,122 +8,60 @@
     body { font-family: sans-serif; max-width: 1400px; margin: 0 auto; padding: 20px; background: #f5f5f5; }
     h1 { color: #333; }
     h2 { margin-top: 0; font-size: 1rem; color: #666; }
-    h3 { color: #333; margin-top: 40px; }
 
-    /* Charts */
     .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
     .card { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
 
-    /* Filter bar */
-    .filter-bar {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 16px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-    .filter-bar select, .filter-bar input {
-      padding: 6px 10px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 0.9rem;
-    }
-    .filter-bar label { font-size: 0.9rem; color: #555; }
-
-    /* Table */
+    .table-section { margin-top: 48px; }
     .table-wrap {
-      background: white;
-      border-radius: 8px;
-      padding: 20px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      overflow-x: auto;
+      background: white; border-radius: 8px; padding: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1); overflow-x: auto; margin-bottom: 28px;
     }
+    .table-wrap h3 { margin-top: 0; font-size: 1.05rem; color: #333; }
+
+    .filter-bar { display: flex; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; align-items: center; }
+    .filter-bar select, .filter-bar input {
+      padding: 5px 9px; border: 1px solid #ccc; border-radius: 6px; font-size: 0.85rem;
+    }
+    .filter-bar label { font-size: 0.85rem; color: #555; }
+
     table { border-collapse: collapse; width: 100%; font-size: 0.88rem; }
     thead tr { background: #f0f0f0; }
-    th { padding: 10px 12px; text-align: left; font-weight: 600; color: #444; border-bottom: 2px solid #ddd; cursor: pointer; user-select: none; }
+    th { padding: 9px 12px; text-align: left; font-weight: 600; color: #444; border-bottom: 2px solid #ddd; cursor: pointer; user-select: none; white-space: nowrap; }
     th:hover { background: #e4e4e4; }
-    th.sorted-asc::after  { content: ' ▲'; font-size: 0.75rem; }
-    th.sorted-desc::after { content: ' ▼'; font-size: 0.75rem; }
-    td { padding: 8px 12px; border-bottom: 1px solid #eee; }
+    th.sorted-asc::after  { content: ' ▲'; font-size: 0.7rem; }
+    th.sorted-desc::after { content: ' ▼'; font-size: 0.7rem; }
+    td { padding: 7px 12px; border-bottom: 1px solid #eee; }
     tr:last-child td { border-bottom: none; }
     tr:hover td { background: #fafafa; }
 
-    /* Score badges */
     .score { display: inline-block; width: 36px; text-align: center; border-radius: 4px; font-weight: bold; padding: 2px 0; }
     .score.red    { background: #fde8e8; color: #c0392b; }
     .score.orange { background: #fef3e2; color: #d35400; }
     .score.green  { background: #e8f8ee; color: #27ae60; }
 
-    /* Pagination */
-    .pagination { display: flex; gap: 6px; margin-top: 14px; justify-content: flex-end; flex-wrap: wrap; }
+    .pagination { display: flex; gap: 6px; margin-top: 12px; justify-content: flex-end; flex-wrap: wrap; }
     .pagination button {
-      padding: 5px 11px; border: 1px solid #ccc; border-radius: 5px;
-      background: white; cursor: pointer; font-size: 0.85rem;
+      padding: 4px 10px; border: 1px solid #ccc; border-radius: 5px;
+      background: white; cursor: pointer; font-size: 0.82rem;
     }
     .pagination button.active { background: #4CAF50; color: white; border-color: #4CAF50; }
     .pagination button:hover:not(.active) { background: #f0f0f0; }
-
-    .row-count { font-size: 0.85rem; color: #888; margin-top: 8px; }
+    .row-count { font-size: 0.82rem; color: #999; margin-top: 6px; }
   </style>
 </head>
 <body>
   <h1>🔦 Lighthouse Dashboard – benu.ch</h1>
-
-  <!-- Charts -->
   <div class="grid" id="charts"></div>
-
-  <!-- Table section -->
-  <h3>📋 Alle Workflow-Runs</h3>
-  <div class="table-wrap">
-    <div class="filter-bar">
-      <label>Seite:
-        <select id="filterPage">
-          <option value="">Alle</option>
-        </select>
-      </label>
-      <label>Von:
-        <input type="date" id="filterFrom">
-      </label>
-      <label>Bis:
-        <input type="date" id="filterTo">
-      </label>
-      <label>Suche Datum/Seite:
-        <input type="text" id="filterSearch" placeholder="z.B. 2026-07">
-      </label>
-      <label>Zeilen pro Seite:
-        <select id="pageSize">
-          <option value="25">25</option>
-          <option value="50" selected>50</option>
-          <option value="100">100</option>
-          <option value="999999">Alle</option>
-        </select>
-      </label>
-    </div>
-
-    <table id="dataTable">
-      <thead>
-        <tr>
-          <th data-col="date">Datum</th>
-          <th data-col="page">Seite</th>
-          <th data-col="performance">Performance</th>
-          <th data-col="accessibility">Accessibility</th>
-          <th data-col="seo">SEO</th>
-          <th data-col="best_practices">Best Practices</th>
-        </tr>
-      </thead>
-      <tbody id="tableBody"></tbody>
-    </table>
-    <div class="row-count" id="rowCount"></div>
-    <div class="pagination" id="pagination"></div>
-  </div>
+  <div class="table-section" id="tables"></div>
 
   <script>
     const PAGES = ["Home", "Editorial", "Pharmacy", "PDP", "Category", "Brandpage (LRP)"];
     const COLORS = {
-      performance:   "#4CAF50",
-      accessibility: "#2196F3",
-      seo:           "#FF9800",
-      best_practices:"#9C27B0"
+      performance:    "#4CAF50",
+      accessibility:  "#2196F3",
+      seo:            "#FF9800",
+      best_practices: "#9C27B0"
     };
 
     function scoreClass(v) {
@@ -131,43 +69,34 @@
       if (v >= 50) return 'orange';
       return 'red';
     }
+    function safeid(p) { return p.replace(/[^a-z0-9]/gi, '-'); }
 
-    // ── State ──────────────────────────────────────────────
-    let allData = [];
-    let filtered = [];
-    let sortCol = 'date';
-    let sortDir = -1;   // -1 = desc, 1 = asc
-    let currentPage = 1;
+    const state = {};
 
-    // ── Fetch & boot ──────────────────────────────────────
     fetch("results.json")
       .then(r => r.json())
       .then(data => {
-        allData = data;
         buildCharts(data);
-        populatePageFilter(data);
-        applyFilters();
+        buildAllTables(data);
       });
 
-    // ── Charts ─────────────────────────────────────────────
     function buildCharts(data) {
       PAGES.forEach(page => {
-        const pageData = data.filter(d => d.page === page);
-        if (!pageData.length) return;
-        const labels = pageData.map(d => d.date);
+        const pd = data.filter(d => d.page === page);
+        if (!pd.length) return;
         const card = document.createElement("div");
         card.className = "card";
-        card.innerHTML = `<h2>${page}</h2><canvas id="chart-${page.replace(/[^a-z0-9]/gi,'-')}"></canvas>`;
+        card.innerHTML = `<h2>${page}</h2><canvas id="chart-${safeid(page)}"></canvas>`;
         document.getElementById("charts").appendChild(card);
-        new Chart(document.getElementById(`chart-${page.replace(/[^a-z0-9]/gi,'-')}`), {
+        new Chart(document.getElementById(`chart-${safeid(page)}`), {
           type: "line",
           data: {
-            labels,
+            labels: pd.map(d => d.date),
             datasets: [
-              { label:"Performance",   data: pageData.map(d=>d.performance),   borderColor: COLORS.performance,   tension:0.3, fill:false },
-              { label:"Accessibility", data: pageData.map(d=>d.accessibility), borderColor: COLORS.accessibility, tension:0.3, fill:false },
-              { label:"SEO",           data: pageData.map(d=>d.seo),           borderColor: COLORS.seo,           tension:0.3, fill:false },
-              { label:"Best Practices",data: pageData.map(d=>d.best_practices),borderColor: COLORS.best_practices,tension:0.3, fill:false }
+              { label:"Performance",    data: pd.map(d=>d.performance),   borderColor: COLORS.performance,   tension:0.3, fill:false },
+              { label:"Accessibility",  data: pd.map(d=>d.accessibility), borderColor: COLORS.accessibility, tension:0.3, fill:false },
+              { label:"SEO",            data: pd.map(d=>d.seo),           borderColor: COLORS.seo,           tension:0.3, fill:false },
+              { label:"Best Practices", data: pd.map(d=>d.best_practices),borderColor: COLORS.best_practices,tension:0.3, fill:false }
             ]
           },
           options: { scales: { y: { min:0, max:100 } } }
@@ -175,64 +104,106 @@
       });
     }
 
-    // ── Page filter dropdown ───────────────────────────────
-    function populatePageFilter(data) {
-      const pages = [...new Set(data.map(d => d.page))].sort();
-      const sel = document.getElementById('filterPage');
-      pages.forEach(p => {
-        const o = document.createElement('option');
-        o.value = p; o.textContent = p;
-        sel.appendChild(o);
+    function buildAllTables(data) {
+      const container = document.getElementById('tables');
+      container.innerHTML = '<h2 style="font-size:1.3rem;color:#333;margin-bottom:4px">📋 Runs nach Seitentyp</h2>';
+
+      PAGES.forEach(page => {
+        const pageData = data.filter(d => d.page === page);
+        if (!pageData.length) return;
+        const id = safeid(page);
+        state[id] = { sortCol:'date', sortDir:-1, currentPage:1, filtered:[...pageData], all:pageData };
+
+        const wrap = document.createElement('div');
+        wrap.className = 'table-wrap';
+        wrap.innerHTML = `
+          <h3>${page} <span style="font-weight:normal;color:#999;font-size:0.85rem">(${pageData.length} Einträge gesamt)</span></h3>
+          <div class="filter-bar">
+            <label>Von: <input type="date" id="from-${id}"></label>
+            <label>Bis: <input type="date" id="to-${id}"></label>
+            <label>Suche: <input type="text" id="search-${id}" placeholder="Datum suchen..."></label>
+            <label>Zeilen:
+              <select id="size-${id}">
+                <option value="25">25</option>
+                <option value="50" selected>50</option>
+                <option value="100">100</option>
+                <option value="999999">Alle</option>
+              </select>
+            </label>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th data-page="${id}" data-col="date">Datum</th>
+                <th data-page="${id}" data-col="performance">Performance</th>
+                <th data-page="${id}" data-col="accessibility">Accessibility</th>
+                <th data-page="${id}" data-col="seo">SEO</th>
+                <th data-page="${id}" data-col="best_practices">Best Practices</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-${id}"></tbody>
+          </table>
+          <div class="row-count" id="count-${id}"></div>
+          <div class="pagination" id="pag-${id}"></div>
+        `;
+        container.appendChild(wrap);
+
+        ['from','to','search','size'].forEach(key => {
+          document.getElementById(`${key}-${id}`).addEventListener('input', () => applyFilter(id));
+        });
+
+        wrap.querySelectorAll('th[data-col]').forEach(th => {
+          th.addEventListener('click', () => {
+            const s = state[id];
+            if (s.sortCol === th.dataset.col) s.sortDir *= -1;
+            else { s.sortCol = th.dataset.col; s.sortDir = -1; }
+            sortAndRender(id);
+          });
+        });
+
+        renderTable(id);
       });
     }
 
-    // ── Filters ────────────────────────────────────────────
-    function applyFilters() {
-      const page   = document.getElementById('filterPage').value;
-      const from   = document.getElementById('filterFrom').value;
-      const to     = document.getElementById('filterTo').value;
-      const search = document.getElementById('filterSearch').value.toLowerCase();
-
-      filtered = allData.filter(d => {
-        const dateStr = d.date.slice(0, 10);
-        if (page   && d.page !== page)          return false;
-        if (from   && dateStr < from)            return false;
-        if (to     && dateStr > to)              return false;
-        if (search && !d.date.toLowerCase().includes(search)
-                   && !d.page.toLowerCase().includes(search)) return false;
+    function applyFilter(id) {
+      const from   = document.getElementById(`from-${id}`).value;
+      const to     = document.getElementById(`to-${id}`).value;
+      const search = document.getElementById(`search-${id}`).value.toLowerCase();
+      const s      = state[id];
+      s.filtered = s.all.filter(d => {
+        const ds = d.date.slice(0,10);
+        if (from   && ds < from) return false;
+        if (to     && ds > to)   return false;
+        if (search && !d.date.toLowerCase().includes(search)) return false;
         return true;
       });
-
-      sortData();
+      s.currentPage = 1;
+      sortAndRender(id);
     }
 
-    // ── Sort ───────────────────────────────────────────────
-    function sortData() {
-      filtered.sort((a, b) => {
-        const av = a[sortCol], bv = b[sortCol];
-        if (typeof av === 'number') return sortDir * (av - bv);
-        return sortDir * String(av).localeCompare(String(bv));
+    function sortAndRender(id) {
+      const s = state[id];
+      s.filtered.sort((a,b) => {
+        const av = a[s.sortCol], bv = b[s.sortCol];
+        if (typeof av === 'number') return s.sortDir * (av - bv);
+        return s.sortDir * String(av).localeCompare(String(bv));
       });
-      currentPage = 1;
-      renderTable();
+      renderTable(id);
     }
 
-    // ── Render table ───────────────────────────────────────
-    function renderTable() {
-      const size  = parseInt(document.getElementById('pageSize').value);
-      const total = filtered.length;
-      const pages = Math.ceil(total / size);
-      const start = (currentPage - 1) * size;
-      const slice = filtered.slice(start, start + size);
+    function renderTable(id) {
+      const s     = state[id];
+      const size  = parseInt(document.getElementById(`size-${id}`).value);
+      const total = s.filtered.length;
+      const pages = Math.ceil(total / size) || 1;
+      const slice = s.filtered.slice((s.currentPage-1)*size, s.currentPage*size);
 
-      const tbody = document.getElementById('tableBody');
+      const tbody = document.getElementById(`tbody-${id}`);
       tbody.innerHTML = '';
-
       slice.forEach(d => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>${d.date}</td>
-          <td>${d.page}</td>
           <td><span class="score ${scoreClass(d.performance)}">${d.performance}</span></td>
           <td><span class="score ${scoreClass(d.accessibility)}">${d.accessibility}</span></td>
           <td><span class="score ${scoreClass(d.seo)}">${d.seo}</span></td>
@@ -240,41 +211,25 @@
         tbody.appendChild(tr);
       });
 
-      // Row count
-      document.getElementById('rowCount').textContent =
-        `${total} Einträge gefunden, Seite ${currentPage} von ${pages || 1}`;
+      document.getElementById(`count-${id}`).textContent =
+        `${total} Einträge · Seite ${s.currentPage} von ${pages}`;
 
-      // Pagination
-      const pag = document.getElementById('pagination');
+      const pag = document.getElementById(`pag-${id}`);
       pag.innerHTML = '';
       for (let i = 1; i <= pages; i++) {
         const btn = document.createElement('button');
         btn.textContent = i;
-        if (i === currentPage) btn.classList.add('active');
-        btn.addEventListener('click', () => { currentPage = i; renderTable(); });
+        if (i === s.currentPage) btn.classList.add('active');
+        btn.addEventListener('click', () => { s.currentPage = i; renderTable(id); });
         pag.appendChild(btn);
       }
 
-      // Sort indicators
-      document.querySelectorAll('#dataTable th').forEach(th => {
+      document.querySelectorAll(`th[data-page="${id}"]`).forEach(th => {
         th.classList.remove('sorted-asc','sorted-desc');
-        if (th.dataset.col === sortCol)
-          th.classList.add(sortDir === 1 ? 'sorted-asc' : 'sorted-desc');
+        if (th.dataset.col === s.sortCol)
+          th.classList.add(s.sortDir === 1 ? 'sorted-asc' : 'sorted-desc');
       });
     }
-
-    // ── Event listeners ────────────────────────────────────
-    ['filterPage','filterFrom','filterTo','filterSearch','pageSize'].forEach(id => {
-      document.getElementById(id).addEventListener('input', applyFilters);
-    });
-
-    document.querySelectorAll('#dataTable th[data-col]').forEach(th => {
-      th.addEventListener('click', () => {
-        if (sortCol === th.dataset.col) { sortDir *= -1; }
-        else { sortCol = th.dataset.col; sortDir = -1; }
-        sortData();
-      });
-    });
   </script>
 </body>
 </html>
