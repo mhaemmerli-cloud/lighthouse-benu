@@ -17830,5 +17830,45 @@
     "accessibility": 88,
     "seo": 100,
     "best_practices": 82
+  },
+  {
+    "date": "2026-09-01 14:24",
+    "page": "Category",
+    "performance": 57,
+    "accessibility": 96,
+    "seo": 100,
+    "best_practices": 82
+  },
+  {
+    "date": "2026-09-01 14:24",
+    "page": "Editorial",
+    "performance": 45,
+    "accessibility": 95,
+    "seo": 92,
+    "best_practices": 82
+  },
+  {
+    "date": "2026-09-01 14:24",
+    "page": "Brandpage (LRP)",
+    "performance": 35,
+    "accessibility": 96,
+    "seo": 100,
+    "best_practices": 82
+  },
+  {
+    "date": "2026-09-01 14:24",
+    "page": "Home",
+    "performance": 40,
+    "accessibility": 96,
+    "seo": 100,
+    "best_practices": 82
+  },
+  {
+    "date": "2026-09-01 14:24",
+    "page": "PDP",
+    "performance": 38,
+    "accessibility": 88,
+    "seo": 100,
+    "best_practices": 82
   }
 ]
