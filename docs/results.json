@@ -20814,5 +20814,53 @@
     "accessibility": 96,
     "seo": 100,
     "best_practices": 82
+  },
+  {
+    "date": "2026-09-22 12:30",
+    "page": "PDP",
+    "performance": 37,
+    "accessibility": 88,
+    "seo": 100,
+    "best_practices": 82
+  },
+  {
+    "date": "2026-09-22 12:28",
+    "page": "Editorial",
+    "performance": 51,
+    "accessibility": 98,
+    "seo": 92,
+    "best_practices": 82
+  },
+  {
+    "date": "2026-09-22 12:28",
+    "page": "Brandpage (LRP)",
+    "performance": 62,
+    "accessibility": 96,
+    "seo": 100,
+    "best_practices": 79
+  },
+  {
+    "date": "2026-09-22 12:28",
+    "page": "Pharmacy",
+    "performance": 35,
+    "accessibility": 89,
+    "seo": 100,
+    "best_practices": 79
+  },
+  {
+    "date": "2026-09-22 12:28",
+    "page": "Home",
+    "performance": 38,
+    "accessibility": 96,
+    "seo": 100,
+    "best_practices": 82
+  },
+  {
+    "date": "2026-09-22 12:28",
+    "page": "Category",
+    "performance": 52,
+    "accessibility": 96,
+    "seo": 100,
+    "best_practices": 82
   }
 ]
