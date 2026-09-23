@@ -2,9 +2,12 @@ name: Daily Lighthouse Test BENU
 
 on:
   schedule:
-    - cron: '0 06 * * *'
-    - cron: '0 10 * * *'
-    - cron: '0 16 * * *'
+    # GitHub Actions verwendet UTC
+    - cron: '0 07 * * *'
+    - cron: '0 09 * * *'
+    - cron: '0 11 * * *'
+    - cron: '0 15 * * *'
+    - cron: '0 18 * * *'
   workflow_dispatch:
 
 permissions:
@@ -13,33 +16,45 @@ permissions:
 jobs:
   lighthouse:
     runs-on: ubuntu-latest
+
     strategy:
       fail-fast: false
       matrix:
         include:
           - name: Home
             url: https://www.benu.ch/
+
           - name: Editorial
             url: https://www.benu.ch/e/flohsamen-das-kleine-wundermittel-mit-grosser-wirkung
-          - name: Pharmacy
-            url: https://www.benu.ch/p/benu-luzern-bahnhof
+
           - name: PDP
             url: https://www.benu.ch/a/kijimea-reizdarm-pro-kapsel-84-stuck-1117904
+
           - name: Category
             url: https://www.benu.ch/c/gesundheit/
-          - name: Brandpage (LRP)
+
+          - name: Brand
             url: https://www.benu.ch/b/la-roche-posay
+          
+          - name: Pharmacy
+            url: https://www.benu.ch/p/benu-fribourg-centre           
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "22"
 
-      - name: Install Chromium
-        run: sudo apt-get install -y chromium-browser
+      - name: Install Chrome
+        uses: browser-actions/setup-chrome@v1
+
+      - name: Verify Chrome Installation
+        run: |
+          which chrome
+          chrome --version
 
       - name: Install Lighthouse
         run: npm install -g lighthouse
@@ -47,41 +62,38 @@ jobs:
       - name: Run Lighthouse
         run: |
           lighthouse "${{ matrix.url }}" \
-            --output json \
-            --output-path ./report.json \
-            --chrome-path=$(which chromium-browser) \
+            --output=json \
+            --output-path=./report.json \
+            --chrome-path=$(which chrome) \
             --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage --disable-gpu" \
             --quiet
 
       - name: Prüfe ob Report existiert
-        run: ls -la *.json
-      
-      - name: Score als Artifact speichern
-        env:
-          PAGE_NAME: ${{ matrix.name }}
         run: |
-          python3 <<'PYEOF' > "score-${PAGE_NAME}.json"
-          import json, os
-          from datetime import datetime, timezone
+          ls -la
+          ls -la report.json
 
-          with open('report.json') as f:
-              d = json.load(f)
+      - name: Score als Artifact speichern
+        run: |
+          DATE=$(date -u +"%Y-%m-%d %H:%M")
 
-          def score(key):
-              v = d.get('categories', {}).get(key, {}).get('score')
-              return int(v * 100) if v is not None else 0
+          PERF=$(python3 -c "import json; d=json.load(open('report.json')); print(round(d['categories']['performance']['score']*100))")
+          ACC=$(python3 -c "import json; d=json.load(open('report.json')); print(round(d['categories']['accessibility']['score']*100))")
+          SEO=$(python3 -c "import json; d=json.load(open('report.json')); print(round(d['categories']['seo']['score']*100))")
+          BP=$(python3 -c "import json; d=json.load(open('report.json')); print(round(d['categories']['best-practices']['score']*100))")
 
-          out = {
-              "date": datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M'),
-              "page": os.environ['PAGE_NAME'],
-              "performance": score('performance'),
-              "accessibility": score('accessibility'),
-              "seo": score('seo'),
-              "best_practices": score('best-practices'),
+          cat > score-${{ matrix.name }}.json << EOF
+          {
+            "date":"$DATE",
+            "page":"${{ matrix.name }}",
+            "performance":$PERF,
+            "accessibility":$ACC,
+            "seo":$SEO,
+            "best_practices":$BP
           }
-          print(json.dumps(out))
-          PYEOF
-          cat "score-${PAGE_NAME}.json"
+          EOF
+
+          cat score-${{ matrix.name }}.json
 
       - name: Artifact hochladen
         uses: actions/upload-artifact@v4
@@ -95,7 +107,8 @@ jobs:
     if: always()
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
       - name: Alle Score-Artifacts herunterladen
         uses: actions/download-artifact@v4
@@ -105,23 +118,48 @@ jobs:
 
       - name: results.json aktualisieren
         run: |
-          python3 - <<EOF
-          import json, glob
-          with open("docs/results.json") as f:
-              data = json.load(f)
+          python3 << 'EOF'
+          import json
+          import glob
+          import os
+
+          results_file = "docs/results.json"
+
+          if os.path.exists(results_file):
+              with open(results_file, encoding="utf-8") as f:
+                  data = json.load(f)
+          else:
+              data = []
+
           for file in glob.glob("scores/score-*/*.json"):
-              print(f"Lese: {file}")
-              with open(file) as f:
+              print(f"Lese {file}")
+              with open(file, encoding="utf-8") as f:
                   data.append(json.load(f))
-          with open("docs/results.json", "w") as f:
+
+          with open(results_file, "w", encoding="utf-8") as f:
               json.dump(data, f, indent=2)
+
           print(f"Gesamt Einträge: {len(data)}")
           EOF
+
+      - name: Sicherheitsprüfung Dashboard
+        run: |
+          echo "Prüfe index.html auf verdächtige Inhalte..."
+
+          if grep -qiE "login.microsoftonline.com|Bei Ihrem Konto anmelden|ConvergedSignIn|aadcdn\.msftauth\.net" docs/index.html; then
+            echo "FEHLER: Verdächtiger Login-Inhalt in docs/index.html gefunden!"
+            exit 1
+          fi
+
+          echo "Dashboard-Prüfung erfolgreich."
 
       - name: Commit & Push
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
+
           git add docs/results.json
-          git commit -m "Lighthouse scores $(date +'%Y-%m-%d')" || echo "Keine Änderungen"
+
+          git commit -m "Lighthouse scores $(date -u +'%Y-%m-%d %H:%M UTC')" || echo "Keine Änderungen"
+
           git push
