@@ -24,7 +24,7 @@ jobs:
           - name: Pharmacy
             url: https://www.benu.ch/p/benu-luzern-bahnhof
           - name: PDP
-            url: https://www.benu.ch/kijimea-reizdarm-pro-kapsel-84-stuck
+            url: https://www.benu.ch/a/kijimea-reizdarm-pro-kapsel-84-stuck-1117904
           - name: Category
             url: https://www.benu.ch/c/gesundheit/
           - name: Brandpage (LRP)
