@@ -70,7 +70,6 @@
     .pagination button:hover:not(.active) { background: #f0f0f0; }
     .row-count { font-size: 0.82rem; color: #999; margin-top: 6px; }
 
-    /* Back to top */
     .back-top { font-size: 0.8rem; color: #aaa; text-decoration: none; float: right; margin-top: 4px; }
     .back-top:hover { color: #4CAF50; }
   </style>
@@ -83,7 +82,7 @@
   <nav class="nav" id="topNav"></nav>
 
   <!-- Charts -->
-  <div class="grid" id="charts"></div>
+  <div class="grid" id="charts-section"></div>
 
   <!-- Tables section -->
   <h2 class="section-title">📋 Runs nach Seitentyp</h2>
@@ -91,7 +90,7 @@
   <div id="tables"></div>
 
   <script>
-    const PAGES = ["Home", "Editorial", "Pharmacy", "PDP", "Category", "Brandpage (LRP)"];
+    const PAGES = ["Home", "Editorial", "Pharmacy", "PDP", "Category"];
     const COLORS = {
       performance:    "#4CAF50",
       accessibility:  "#2196F3",
@@ -118,10 +117,9 @@
 
     // ── Navigation ────────────────────────────────────────
     function buildNav(data) {
-      const topNav     = document.getElementById('topNav');
+      const topNav      = document.getElementById('topNav');
       const anchorLinks = document.getElementById('anchorLinks');
 
-      // Link to charts section
       const chartLink = document.createElement('a');
       chartLink.href = '#charts-section';
       chartLink.textContent = '📈 Charts';
@@ -132,21 +130,16 @@
         if (!pd.length) return;
         const id = safeid(page);
 
-        // Top nav
         const a1 = document.createElement('a');
         a1.href = `#table-${id}`;
         a1.textContent = page;
         topNav.appendChild(a1);
 
-        // Anchor links above tables
         const a2 = document.createElement('a');
         a2.href = `#table-${id}`;
         a2.textContent = page;
         anchorLinks.appendChild(a2);
       });
-
-      // Add charts anchor
-      document.getElementById('charts').id = 'charts-section';
     }
 
     // ── Charts ────────────────────────────────────────────
@@ -183,7 +176,6 @@
         if (!pageData.length) return;
         const id = safeid(page);
 
-        // Default: sorted by date descending
         const sorted = [...pageData].sort((a,b) => b.date.localeCompare(a.date));
         state[id] = { sortCol:'date', sortDir:-1, currentPage:1, filtered: sorted, all: pageData };
 
