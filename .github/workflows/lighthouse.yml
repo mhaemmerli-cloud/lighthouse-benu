@@ -37,7 +37,7 @@ jobs:
             url: https://www.benu.ch/b/la-roche-posay
           
           - name: Pharmacy
-            url: https://www.benu.ch/p/benu-fribourg-centre           
+            url: https://www.benu.ch/p/benu-zurich-bahnhof-altstetten           
 
     steps:
       - name: Checkout Repository
