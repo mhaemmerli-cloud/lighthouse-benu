@@ -554,4 +554,627 @@
         );
 
         const performanceMedian =
-          
+          mapDailyMedianToRuns(
+            sortedData,
+            calculateDailyMedian(
+              sortedData,
+              "performance"
+            )
+          );
+
+        const accessibilityMedian =
+          mapDailyMedianToRuns(
+            sortedData,
+            calculateDailyMedian(
+              sortedData,
+              "accessibility"
+            )
+          );
+
+        const seoMedian =
+          mapDailyMedianToRuns(
+            sortedData,
+            calculateDailyMedian(
+              sortedData,
+              "seo"
+            )
+          );
+
+        const bestPracticesMedian =
+          mapDailyMedianToRuns(
+            sortedData,
+            calculateDailyMedian(
+              sortedData,
+              "best_practices"
+            )
+          );
+
+        const pageId = safeid(page);
+
+        const card =
+          document.createElement("div");
+
+        card.className = "card";
+
+        card.innerHTML = `
+          <h2>${page}</h2>
+
+          <div class="chart-container">
+            <canvas id="chart-${pageId}"></canvas>
+          </div>
+        `;
+
+        chartsContainer.appendChild(card);
+
+        const canvas =
+          document.getElementById(
+            `chart-${pageId}`
+          );
+
+        new Chart(canvas, {
+          type: "line",
+
+          data: {
+            labels: sortedData.map(
+              item => item.date
+            ),
+
+            datasets: [
+              createRunDataset(
+                "Performance",
+                sortedData.map(
+                  item => Number(item.performance)
+                ),
+                COLORS.performance
+              ),
+
+              createMedianDataset(
+                "Performance Tagesmedian",
+                performanceMedian,
+                MEDIAN_COLORS.performance
+              ),
+
+              createRunDataset(
+                "Accessibility",
+                sortedData.map(
+                  item => Number(item.accessibility)
+                ),
+                COLORS.accessibility
+              ),
+
+              createMedianDataset(
+                "Accessibility Tagesmedian",
+                accessibilityMedian,
+                MEDIAN_COLORS.accessibility
+              ),
+
+              createRunDataset(
+                "SEO",
+                sortedData.map(
+                  item => Number(item.seo)
+                ),
+                COLORS.seo
+              ),
+
+              createMedianDataset(
+                "SEO Tagesmedian",
+                seoMedian,
+                MEDIAN_COLORS.seo
+              ),
+
+              createRunDataset(
+                "Best Practices",
+                sortedData.map(
+                  item => Number(item.best_practices)
+                ),
+                COLORS.best_practices
+              ),
+
+              createMedianDataset(
+                "Best Practices Tagesmedian",
+                bestPracticesMedian,
+                MEDIAN_COLORS.best_practices
+              )
+            ]
+          },
+
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+
+            interaction: {
+              mode: "index",
+              intersect: false
+            },
+
+            plugins: {
+              legend: {
+                labels: {
+                  usePointStyle: true,
+                  boxWidth: 12
+                }
+              },
+
+              tooltip: {
+                callbacks: {
+                  afterBody: tooltipItems => {
+                    if (!tooltipItems.length) {
+                      return "";
+                    }
+
+                    const dataIndex =
+                      tooltipItems[0].dataIndex;
+
+                    const selectedDate =
+                      sortedData[dataIndex].date;
+
+                    const day =
+                      String(selectedDate).slice(
+                        0,
+                        10
+                      );
+
+                    const runs =
+                      getRunsForDay(
+                        sortedData,
+                        selectedDate
+                      );
+
+                    return [
+                      `Datum: ${day}`,
+                      `Messungen an diesem Tag: ${runs}`
+                    ];
+                  }
+                }
+              }
+            },
+
+            scales: {
+              x: {
+                ticks: {
+                  maxRotation: 50,
+                  minRotation: 45,
+                  autoSkip: true,
+                  maxTicksLimit: 18
+                }
+              },
+
+              y: {
+                min: 0,
+                max: 100,
+                ticks: {
+                  stepSize: 10
+                }
+              }
+            }
+          }
+        });
+      });
+    }
+
+    function createRunDataset(
+      label,
+      values,
+      color
+    ) {
+      return {
+        label,
+        data: values,
+        borderColor: color,
+        backgroundColor: color,
+        borderWidth: 1.5,
+        pointRadius: 2,
+        pointHoverRadius: 5,
+        tension: 0.3,
+        fill: false,
+        order: 2
+      };
+    }
+
+    function createMedianDataset(
+      label,
+      values,
+      color
+    ) {
+      return {
+        label,
+        data: values,
+        borderColor: color,
+        backgroundColor: color,
+        borderWidth: 3,
+        borderDash: [8, 5],
+        pointRadius: 4,
+        pointHoverRadius: 7,
+        pointBackgroundColor: color,
+        pointBorderColor: "#ffffff",
+        pointBorderWidth: 1,
+        spanGaps: true,
+        tension: 0.2,
+        fill: false,
+        order: 1
+      };
+    }
+
+    function buildAllTables(data) {
+      const container =
+        document.getElementById("tables");
+
+      PAGES.forEach(page => {
+        const pageData = data.filter(
+          item => item.page === page
+        );
+
+        if (!pageData.length) {
+          return;
+        }
+
+        const id = safeid(page);
+
+        const sorted = [...pageData].sort(
+          (a, b) =>
+            String(b.date).localeCompare(
+              String(a.date)
+            )
+        );
+
+        state[id] = {
+          sortCol: "date",
+          sortDir: -1,
+          currentPage: 1,
+          filtered: sorted,
+          all: pageData
+        };
+
+        const wrap =
+          document.createElement("div");
+
+        wrap.className = "table-wrap";
+        wrap.id = `table-${id}`;
+
+        wrap.innerHTML = `
+          <a class="back-top" href="#top">
+            ↑ Nach oben
+          </a>
+
+          <h3>
+            ${page}
+
+            <span style="
+              font-weight: normal;
+              color: #999;
+              font-size: 0.85rem;
+            ">
+              (${pageData.length} Einträge gesamt)
+            </span>
+          </h3>
+
+          <div class="filter-bar">
+            <label>
+              Von:
+              <input type="date" id="from-${id}">
+            </label>
+
+            <label>
+              Bis:
+              <input type="date" id="to-${id}">
+            </label>
+
+            <label>
+              Suche:
+              <input
+                type="text"
+                id="search-${id}"
+                placeholder="Datum suchen..."
+              >
+            </label>
+
+            <label>
+              Zeilen:
+
+              <select id="size-${id}">
+                <option value="25" selected>25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+                <option value="999999">Alle</option>
+              </select>
+            </label>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th data-page="${id}" data-col="date">
+                  Datum
+                </th>
+
+                <th data-page="${id}" data-col="performance">
+                  Performance
+                </th>
+
+                <th data-page="${id}" data-col="accessibility">
+                  Accessibility
+                </th>
+
+                <th data-page="${id}" data-col="seo">
+                  SEO
+                </th>
+
+                <th data-page="${id}" data-col="best_practices">
+                  Best Practices
+                </th>
+              </tr>
+            </thead>
+
+            <tbody id="tbody-${id}"></tbody>
+          </table>
+
+          <div class="row-count" id="count-${id}"></div>
+
+          <div class="pagination" id="pag-${id}"></div>
+        `;
+
+        container.appendChild(wrap);
+
+        ["from", "to", "search", "size"].forEach(
+          key => {
+            document
+              .getElementById(`${key}-${id}`)
+              .addEventListener(
+                "input",
+                () => applyFilter(id)
+              );
+          }
+        );
+
+        wrap
+          .querySelectorAll("th[data-col]")
+          .forEach(tableHeader => {
+            tableHeader.addEventListener(
+              "click",
+              () => {
+                const currentState =
+                  state[id];
+
+                if (
+                  currentState.sortCol ===
+                  tableHeader.dataset.col
+                ) {
+                  currentState.sortDir *= -1;
+                } else {
+                  currentState.sortCol =
+                    tableHeader.dataset.col;
+
+                  currentState.sortDir = -1;
+                }
+
+                sortAndRender(id);
+              }
+            );
+          });
+
+        renderTable(id);
+      });
+    }
+
+    function applyFilter(id) {
+      const from =
+        document.getElementById(
+          `from-${id}`
+        ).value;
+
+      const to =
+        document.getElementById(
+          `to-${id}`
+        ).value;
+
+      const search =
+        document
+          .getElementById(`search-${id}`)
+          .value
+          .toLowerCase();
+
+      const currentState = state[id];
+
+      currentState.filtered =
+        currentState.all.filter(item => {
+          const dateString =
+            String(item.date).slice(0, 10);
+
+          if (from && dateString < from) {
+            return false;
+          }
+
+          if (to && dateString > to) {
+            return false;
+          }
+
+          if (
+            search &&
+            !String(item.date)
+              .toLowerCase()
+              .includes(search)
+          ) {
+            return false;
+          }
+
+          return true;
+        });
+
+      currentState.currentPage = 1;
+
+      sortAndRender(id);
+    }
+
+    function sortAndRender(id) {
+      const currentState = state[id];
+
+      currentState.filtered.sort((a, b) => {
+        const firstValue =
+          a[currentState.sortCol];
+
+        const secondValue =
+          b[currentState.sortCol];
+
+        if (
+          typeof firstValue === "number" &&
+          typeof secondValue === "number"
+        ) {
+          return (
+            currentState.sortDir *
+            (firstValue - secondValue)
+          );
+        }
+
+        return (
+          currentState.sortDir *
+          String(firstValue ?? "")
+            .localeCompare(
+              String(secondValue ?? "")
+            )
+        );
+      });
+
+      renderTable(id);
+    }
+
+    function renderTable(id) {
+      const currentState = state[id];
+
+      const pageSize = parseInt(
+        document.getElementById(
+          `size-${id}`
+        ).value,
+        10
+      );
+
+      const total =
+        currentState.filtered.length;
+
+      const totalPages =
+        Math.ceil(total / pageSize) || 1;
+
+      currentState.currentPage = Math.min(
+        currentState.currentPage,
+        totalPages
+      );
+
+      const startIndex =
+        (currentState.currentPage - 1) *
+        pageSize;
+
+      const currentRows =
+        currentState.filtered.slice(
+          startIndex,
+          startIndex + pageSize
+        );
+
+      const tableBody =
+        document.getElementById(
+          `tbody-${id}`
+        );
+
+      tableBody.innerHTML = "";
+
+      currentRows.forEach(item => {
+        const row =
+          document.createElement("tr");
+
+        row.innerHTML = `
+          <td>${item.date}</td>
+
+          <td>
+            <span class="score ${scoreClass(Number(item.performance))}">
+              ${item.performance}
+            </span>
+          </td>
+
+          <td>
+            <span class="score ${scoreClass(Number(item.accessibility))}">
+              ${item.accessibility}
+            </span>
+          </td>
+
+          <td>
+            <span class="score ${scoreClass(Number(item.seo))}">
+              ${item.seo}
+            </span>
+          </td>
+
+          <td>
+            <span class="score ${scoreClass(Number(item.best_practices))}">
+              ${item.best_practices}
+            </span>
+          </td>
+        `;
+
+        tableBody.appendChild(row);
+      });
+
+      document.getElementById(
+        `count-${id}`
+      ).textContent =
+        `${total} Einträge · Seite ` +
+        `${currentState.currentPage} von ${totalPages}`;
+
+      const pagination =
+        document.getElementById(
+          `pag-${id}`
+        );
+
+      pagination.innerHTML = "";
+
+      for (
+        let pageNumber = 1;
+        pageNumber <= totalPages;
+        pageNumber++
+      ) {
+        const button =
+          document.createElement("button");
+
+        button.textContent = pageNumber;
+
+        if (
+          pageNumber ===
+          currentState.currentPage
+        ) {
+          button.classList.add("active");
+        }
+
+        button.addEventListener(
+          "click",
+          () => {
+            currentState.currentPage =
+              pageNumber;
+
+            renderTable(id);
+          }
+        );
+
+        pagination.appendChild(button);
+      }
+
+      document
+        .querySelectorAll(
+          `th[data-page="${id}"]`
+        )
+        .forEach(tableHeader => {
+          tableHeader.classList.remove(
+            "sorted-asc",
+            "sorted-desc"
+          );
+
+          if (
+            tableHeader.dataset.col ===
+            currentState.sortCol
+          ) {
+            tableHeader.classList.add(
+              currentState.sortDir === 1
+                ? "sorted-asc"
+                : "sorted-desc"
+            );
+          }
+        });
+    }
+  </script>
+</body>
+</html>
